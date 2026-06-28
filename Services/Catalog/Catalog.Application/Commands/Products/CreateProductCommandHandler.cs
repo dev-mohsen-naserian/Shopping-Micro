@@ -1,0 +1,28 @@
+﻿using AutoMapper;
+using Catalog.Application.Responses;
+using Catalog.Core.Entities;
+using Catalog.Core.Repositories;
+using MediatR;
+
+namespace Catalog.Application.Commands.Products;
+
+public class CreateProductCommand : IRequest<ProductResponse>
+{
+    public string Name { get; set; }
+    public string Summery { get; set; }
+    public string Description { get; set; }
+    public string ImageFile { get; set; }
+    public decimal Price { get; set; }
+    //Relations
+    public ProductBrand Brands { get; set; }
+    public ProductType Types { get; set; }
+}
+public class CreateProductCommandHandler(IProductRepository productRepository, IMapper mapper) : IRequestHandler<CreateProductCommand, ProductResponse>
+{
+    public async Task<ProductResponse> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+    {
+        var entity = mapper.Map<Product>(request);
+        var result = await productRepository.CreateProduct(entity);
+        return mapper.Map<ProductResponse>(result);
+    }
+}

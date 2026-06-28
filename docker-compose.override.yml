@@ -1,0 +1,30 @@
+services:
+  catalogdb:
+    container_name: catalogdb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - "mongo_data:/data/db"
+  
+  #catalogApi
+  catalog.api:
+    environment:
+      -  ASPNETCORE_ENVIRONMENT=Development
+      -  ASPNETCORE_Urls=http://+8080
+      - "DatabaseSettings__ConnectionString=mongodb://catalodb:27017" 
+      - "DatabaseSettings__DatabaseName=CatalogDb" 
+      - "DatabaseSettings__CollectionName=Products" 
+      - "DatabaseSettings__BrandCollection=Brands"
+      - "DatabaseSettings__TypeCollection=Types"
+      - "ElasticConfiguration__Uri=http://elasticsearch:9200"
+    depends_on:
+      - catalogdb
+
+    ports:
+      - "9000:8080"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
